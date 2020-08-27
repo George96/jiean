@@ -26,7 +26,14 @@ public class RedisConfig extends CachingConfigurerSupport {
         RedisTemplate<Object, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
+        //key采用String序列化方式
+        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+        //使用StringRedisSerializer来序列化和反序列化redis的key值
+        template.setKeySerializer(stringRedisSerializer);
+        template.setHashKeySerializer(stringRedisSerializer);
+
+        //value采用FastJson序列化方式
+        FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer<Object>(Object.class);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
@@ -34,8 +41,6 @@ public class RedisConfig extends CachingConfigurerSupport {
         serializer.setObjectMapper(mapper);
 
         template.setValueSerializer(serializer);
-        // 使用StringRedisSerializer来序列化和反序列化redis的key值
-        template.setKeySerializer(new StringRedisSerializer());
         template.afterPropertiesSet();
         return template;
     }

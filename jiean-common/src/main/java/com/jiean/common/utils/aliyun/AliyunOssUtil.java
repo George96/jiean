@@ -29,7 +29,6 @@ public class AliyunOssUtil {
 
     private static String FILE_URL;
 
-    public static OSSClient client;
 
 
     /**
@@ -39,9 +38,13 @@ public class AliyunOssUtil {
      * @return 如果上传的文件是图片的话，会返回图片的"URL"，如果非图片的话会返回"非图片，不可预览。文件路径为：+文件路径"
      */
     public static String upLoad(File file, String fileHost, String suffix) {
-
         // 默认值为：true
         boolean isImage = true;
+        // 判断文件
+        if (file == null) {
+            return null;
+        }
+
         // 判断所要上传的图片是否是图片，图片可以预览，其他文件不提供通过URL预览
         try {
             Image image = ImageIO.read(file);
@@ -56,12 +59,8 @@ public class AliyunOssUtil {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
         String dateString = sdf.format(new Date()) + "." + suffix; // 20180322010634.jpg
 
-        // 判断文件
-        if (file == null) {
-            return null;
-        }
         // 创建OSSClient实例。
-        OSSClient ossClient = new OSSClient(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
+        OSS ossClient = new OSSClientBuilder().build(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
         try {
             // 判断容器是否存在,不存在就创建
             if (!ossClient.doesBucketExist(AliyunOssProperties.OSS_BUCKET_NAME)) {
@@ -108,7 +107,7 @@ public class AliyunOssUtil {
     public static void downloadFile(String objectName, String localFileName) {
 
         // 创建OSSClient实例。
-        OSSClient ossClient = new OSSClient(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
+        OSS ossClient = new OSSClientBuilder().build(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
         // 下载OSS文件到本地文件。如果指定的本地文件存在会覆盖，不存在则新建。
         ossClient.getObject(new GetObjectRequest(AliyunOssProperties.OSS_BUCKET_NAME, objectName), new File(localFileName));
         // 关闭OSSClient。
@@ -124,7 +123,7 @@ public class AliyunOssUtil {
     public static Boolean delFile(String filePath) {
         logger.info("删除开始，objectName=" + filePath);
         // 创建OSSClient实例。
-        OSSClient ossClient = new OSSClient(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
+        OSS ossClient = new OSSClientBuilder().build(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
 
         // 删除Object.
         boolean exist = ossClient.doesObjectExist(AliyunOssProperties.OSS_BUCKET_NAME, filePath);
@@ -145,7 +144,7 @@ public class AliyunOssUtil {
      */
     public static Boolean delFileList(java.util.List<String> keys) {
         // 创建OSSClient实例。
-        OSSClient ossClient = new OSSClient(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
+        OSS ossClient = new OSSClientBuilder().build(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
         try {
             // 删除文件。
             DeleteObjectsResult deleteObjectsResult = ossClient.deleteObjects(new DeleteObjectsRequest(AliyunOssProperties.OSS_BUCKET_NAME).withKeys(keys));
@@ -166,9 +165,9 @@ public class AliyunOssUtil {
      * @param fileName
      * @return
      */
-    public static java.util.List<String> fileFolder(String fileName) {
+    public static java.util.List<String> fileFolder(String fileName)  {
         // 创建OSSClient实例。
-        OSSClient ossClient = new OSSClient(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
+        OSS ossClient = new OSSClientBuilder().build(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
         // 构造ListObjectsRequest请求。
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest(AliyunOssProperties.OSS_BUCKET_NAME);
         // 设置正斜线（/）为文件夹的分隔符。
@@ -196,7 +195,7 @@ public class AliyunOssUtil {
      */
     public static java.util.List<String> listFile(String fileHost) {
         // 创建OSSClient实例。
-        OSSClient ossClient = new OSSClient(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
+        OSS ossClient = new OSSClientBuilder().build(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
         // 构造ListObjectsRequest请求
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest(AliyunOssProperties.OSS_BUCKET_NAME);
 
@@ -226,12 +225,12 @@ public class AliyunOssUtil {
      */
     public static String getUrl(String objectName) {
         // 创建OSSClient实例。
-        OSSClient ossClient = new OSSClient(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
+        OSS ossClient = new OSSClientBuilder().build(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
         // 设置权限(公开读)
         ossClient.setBucketAcl(AliyunOssProperties.OSS_BUCKET_NAME, CannedAccessControlList.PublicRead);
         // 设置图片处理样式。
 //        String style = "image/resize,m_fixed,w_100,h_100/rotate,90";
-        Date expiration = new Date(new Date().getTime() + 3600L * 1000 * 24 * 365 * 100);
+        Date expiration = new Date(System.currentTimeMillis() + 3600L * 1000 * 24 * 365 * 100);
         GeneratePresignedUrlRequest req = new GeneratePresignedUrlRequest(AliyunOssProperties.OSS_BUCKET_NAME, objectName, HttpMethod.GET);
         req.setExpiration(expiration);
 //        req.setProcess(style);
@@ -261,7 +260,7 @@ public class AliyunOssUtil {
      */
     public static String createFolder(String folder) {
         // 创建OSSClient实例。
-        OSSClient ossClient = new OSSClient(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
+        OSS ossClient = new OSSClientBuilder().build(AliyunOssProperties.OSS_END_POINT, AliyunOssProperties.ACCESS_KEY_ID, AliyunOssProperties.ACCESS_KEY_SECRET);
         // 文件夹名
         final String keySuffixWithSlash = folder;
         // 判断文件夹是否存在，不存在则创建

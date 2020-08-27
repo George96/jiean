@@ -52,9 +52,8 @@ public class TestController extends BaseController {
     @GetMapping("testApi")
     public RestResponse testApi(SysUser sysUser){
         startPage();
-        sysUser.setUserId(123414523L);
+        sysUser.setUserId(1L);
         List<SysUser> sysUsers = testService.selectUserList(sysUser);
-        int i=1/0;
         return RestResponse.success(sysUsers);
     }
 

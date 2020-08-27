@@ -42,7 +42,7 @@ logging:
 # Spring配置
 spring:
   profiles:
-      active: prod
+      active: dev
   # 资源信息
   messages:
     # 国际化资源文件路径
@@ -58,7 +58,7 @@ spring:
   devtools:
     restart:
       # 热部署开关
-      enabled: true
+      enabled: false
 
 # token配置
 token:
