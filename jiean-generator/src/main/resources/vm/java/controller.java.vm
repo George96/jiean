@@ -1,13 +1,6 @@
 package ${packageName}.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-
 import java.util.List;
-import java.util.Arrays;
-
-import com.jiean.common.core.domain.RestResponse;
-import com.jiean.common.utils.StringUtils;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.jiean.common.annotation.Log;
 import com.jiean.common.core.controller.BaseController;
-import com.jiean.common.enums.BusinessType;
+import com.jiean.common.core.domain.RestResponse;
+import com.jiean.common.enums.system.BusinessType;
 import ${packageName}.domain.${ClassName};
 import ${packageName}.service.I${ClassName}Service;
 import com.jiean.common.utils.poi.ExcelUtil;
@@ -35,12 +29,12 @@ import com.jiean.common.core.page.TableDataInfo;
  * @author ${author}
  * @date ${datetime}
  */
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RestController
 @RequestMapping("/${moduleName}/${businessName}")
-public class ${ClassName}Controller extends BaseController {
-
-    private final I${ClassName}Service i${ClassName}Service;
+public class ${ClassName}Controller extends BaseController
+{
+    @Autowired
+    private I${ClassName}Service ${className}Service;
 
 /**
  * 查询${functionName}列表
@@ -48,96 +42,16 @@ public class ${ClassName}Controller extends BaseController {
 @PreAuthorize("@ss.hasPermi('${permissionPrefix}:list')")
 @GetMapping("/list")
     #if($table.crud)
-    public TableDataInfo list(${ClassName} ${className}) {
+    public TableDataInfo list(${ClassName} ${className})
+    {
         startPage();
-        LambdaQueryWrapper<${ClassName}> lqw = new LambdaQueryWrapper<${ClassName}>();
-        #foreach($column in $columns)
-            #set($queryType=$column.queryType)
-            #set($javaField=$column.javaField)
-            #set($javaType=$column.javaType)
-            #set($columnName=$column.columnName)
-            #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-            #if($column.query)
-                #if($column.queryType == "EQ")
-                    #if($javaType == 'String')
-                        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-                        lqw.eq(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #else
-                        if (${className}.get$AttrName() != null){
-                        lqw.eq(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #end
-                #elseif($queryType == "NE")
-                    #if($javaType == 'String')
-                        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-                        lqw.ne(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #else
-                        if (${className}.get$AttrName() != null){
-                        lqw.ne(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #end
-                #elseif($queryType == "GT")
-                    #if($javaType == 'String')
-                        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-                        lqw.gt(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #else
-                        if (${className}.get$AttrName() != null){
-                        lqw.gt(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #end
-                #elseif($queryType == "GTE")
-                    #if($javaType == 'String')
-                        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-                        lqw.ge(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #else
-                        if (${className}.get$AttrName() != null){
-                        lqw.ge(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #end
-                #elseif($queryType == "LT")
-                    #if($javaType == 'String')
-                        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-                        lqw.lt(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #else
-                        if (${className}.get$AttrName() != null){
-                        lqw.lt(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #end
-                #elseif($queryType == "LTE")
-                    #if($javaType == 'String')
-                        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-                        lqw.le(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #else
-                        if (${className}.get$AttrName() != null){
-                        lqw.le(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #end
-                #elseif($queryType == "LIKE")
-                    #if($javaType == 'String')
-                        if (StringUtils.isNotBlank(${className}.get$AttrName())){
-                        lqw.like(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #else
-                        if (${className}.get$AttrName() != null){
-                        lqw.like(${ClassName}::get$AttrName ,${className}.get$AttrName());
-                    }
-                    #end
-                #elseif($queryType == "BETWEEN")
-                #end
-            #end
-        #end
-        List<${ClassName}> list = i${ClassName}Service.list(lqw);
+        List<${ClassName}> list = ${className}Service.select${ClassName}List(${className});
         return getDataTable(list);
     }
     #elseif($table.tree)
-        public RestResponse list(${ClassName} ${className}) {
-            List<${ClassName}> list = i${ClassName}Service.list(lqw);
+        public RestResponse list(${ClassName} ${className})
+        {
+            List<${ClassName}> list = ${className}Service.select${ClassName}List(${className});
             return RestResponse.success(list);
         }
     #end
@@ -148,10 +62,10 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:export')")
     @Log(title = "${functionName}", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
-    public RestResponse export(${ClassName} ${className}) {
-        LambdaQueryWrapper<${ClassName}> lqw = new LambdaQueryWrapper<${ClassName}>(${className});
-        List<${ClassName}> list = i${ClassName}Service.list(lqw);
-        ExcelUtil<${ClassName}> util = new ExcelUtil<${ClassName}>(${ClassName}. class);
+    public RestResponse export(${ClassName} ${className})
+    {
+        List<${ClassName}> list = ${className}Service.select${ClassName}List(${className});
+        ExcelUtil<${ClassName}> util = new ExcelUtil<${ClassName}>(${ClassName}.class);
         return util.exportExcel(list, "${businessName}");
     }
 
@@ -160,8 +74,9 @@ public class ${ClassName}Controller extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:query')")
     @GetMapping(value = "/{${pkColumn.javaField}}")
-    public RestResponse getInfo(@PathVariable("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField}) {
-        return RestResponse.success(i${ClassName}Service.getById(${pkColumn.javaField}));
+    public RestResponse getInfo(@PathVariable("${pkColumn.javaField}") ${pkColumn.javaType} ${pkColumn.javaField})
+    {
+        return RestResponse.success(${className}Service.select${ClassName}ById(${pkColumn.javaField}));
     }
 
     /**
@@ -170,8 +85,9 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:add')")
     @Log(title = "${functionName}", businessType = BusinessType.INSERT)
     @PostMapping
-    public RestResponse add(@RequestBody ${ClassName} ${className}) {
-        return toAjax(i${ClassName}Service.save(${className}) ? 1 : 0);
+    public RestResponse add(@RequestBody ${ClassName} ${className})
+    {
+        return toAjax(${className}Service.insert${ClassName}(${className}));
     }
 
     /**
@@ -180,8 +96,9 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:edit')")
     @Log(title = "${functionName}", businessType = BusinessType.UPDATE)
     @PutMapping
-    public RestResponse edit(@RequestBody ${ClassName} ${className}) {
-        return toAjax(i${ClassName}Service.updateById(${className}) ? 1 : 0);
+    public RestResponse edit(@RequestBody ${ClassName} ${className})
+    {
+        return toAjax(${className}Service.update${ClassName}(${className}));
     }
 
     /**
@@ -190,7 +107,8 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:remove')")
     @Log(title = "${functionName}", businessType = BusinessType.DELETE)
     @DeleteMapping("/{${pkColumn.javaField}s}")
-    public RestResponse remove(@PathVariable ${pkColumn.javaType}[]${pkColumn.javaField}s) {
-        return toAjax(i${ClassName}Service.removeByIds(Arrays.asList(${pkColumn.javaField}s)) ? 1 : 0);
+    public RestResponse remove(@PathVariable ${pkColumn.javaType}[] ${pkColumn.javaField}s)
+    {
+        return toAjax(${className}Service.delete${ClassName}ByIds(${pkColumn.javaField}s));
     }
 }
